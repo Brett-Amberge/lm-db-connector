@@ -1,3 +1,7 @@
+"""
+    Main extension file for connecting to mysql database
+"""
+
 import omni.ext
 import omni.ui as ui
 import carb
@@ -12,11 +16,6 @@ except ImportError:
     carb.log_warn("[lm.db.connector] PyMysql not found, attempting to install")
     omni.kit.pipapi.install("pymysql")
     import pymysql
-
-
-"""
-    Main extension file for connecting to mysql database
-"""
 
 
 # Any class derived from `omni.ext.IExt` in top level module (defined in `python.modules` of `extension.toml`) will be
