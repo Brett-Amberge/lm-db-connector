@@ -67,7 +67,7 @@ class Connector(omni.ext.IExt):
 
                     with ui.VStack():
                         ui.Label("Password:", style=lab_style)
-                        pField = ui.StringField()
+                        pField = ui.StringField(password_mode=True)
                         pField.model.add_end_edit_fn(lambda m, value=self._model.get_pass():
                                                      self.on_changed(value, m.get_value_as_string()))
 
