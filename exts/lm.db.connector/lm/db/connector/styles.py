@@ -1,9 +1,8 @@
-import omni.ui as ui
-
-
 """
     Defines some re-usable UI styles
 """
+
+import omni.ui as ui
 
 
 rect_style = {
