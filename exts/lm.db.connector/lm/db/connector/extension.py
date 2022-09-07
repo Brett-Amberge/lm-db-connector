@@ -7,7 +7,7 @@ import omni.ui as ui
 import carb
 
 from .db_model import DBModel
-from .styles import lab_style, rect_style
+from .styles import lab_style, rect_style, btn_style, db_style
 
 # Try to import the mysql library
 try:
@@ -81,10 +81,10 @@ class Connector(omni.ext.IExt):
                                     for i in range(len(entry)):
                                         with ui.ZStack():
                                             ui.Rectangle(style=rect_style)
-                                            ui.Label(str(entry[i]), style=lab_style)
+                                            ui.Label(str(entry[i]), style=db_style)
                 else:
-                    ui.Button(text="Connect to a databse", clicked_fn=lambda: self.on_pressed(),
-                              style=lab_style)
+                    ui.Button(text="Connect to a database", clicked_fn=lambda: self.on_pressed(),
+                              style=btn_style)
 
     # ext_id is current extension id. It can be used with extension manager to query additional information, like where
     # this extension is located on filesystem.
