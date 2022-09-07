@@ -27,6 +27,7 @@ class Connector(omni.ext.IExt):
     def __init__(self):
         self._model = DBModel()
         self._window = None
+        self._headers = None
         self.label_style = lab_style
 
     # Attempt to connect to the sql database with user provided username and password
@@ -35,7 +36,11 @@ class Connector(omni.ext.IExt):
             cnx = pymysql.connect(user=user, password=password, host='127.0.0.1', port=3306, database='sakila')
             with cnx:
                 with cnx.cursor() as cursor:
-                    sql = "SELECT * FROM actor"
+                    sql = "SELECT DISTINCT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME=\"film\" ORDER BY ORDINAL_POSITION"
+                    cursor.execute(sql)
+                    self._headers = cursor.fetchall()
+
+                    sql = "SELECT * FROM film"
                     cursor.execute(sql)
                     result = cursor.fetchall()
                     return result
@@ -76,6 +81,10 @@ class Connector(omni.ext.IExt):
                     with ui.ScrollingFrame(horizontal_scrollbar_policy=ui.ScrollBarPolicy.SCROLLBAR_AS_NEEDED,
                                            vectrical_scrollbar_policy=ui.ScrollBarPolicy.SCROLLBAR_AS_NEEDED):
                         with ui.VGrid():
+                            with ui.HStack():
+                                for i in range(len(self._headers)):
+                                    ui.Rectangle(style=rect_style)
+                                    ui.Label(str(self._headers[i]), style=lab_style)
                             for entry in result:
                                 with ui.HStack():
                                     for i in range(len(entry)):
