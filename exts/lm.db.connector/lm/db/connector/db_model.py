@@ -1,9 +1,8 @@
-from omni.ui import scene as sc
-
-
 """
     Stores user information and query data
 """
+
+from omni.ui import scene as sc
 
 
 class DBModel():
