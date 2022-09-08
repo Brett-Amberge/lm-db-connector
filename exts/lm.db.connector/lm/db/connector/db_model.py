@@ -75,8 +75,8 @@ class DBModel(sc.AbstractManipulatorModel):
         if item == self.position:
             return self._get_position()
 
-        if item == self._user:
-            item.value
+        if item:
+            return item.value
         return False
 
     def _get_position(self):

@@ -54,25 +54,27 @@ class Connector(omni.ext.IExt):
     def on_pressed(self):
         self._model.set_value(self._model.get_item("result"),
                               self.connect(self._model.get_value(self._model.get_item("user")),
-                              self._model.get_value(self._model.get_item("pass"))))
-        self.build_ui(self._model.get_item("result"))
+                                           self._model.get_value(self._model.get_item("pass"))))
+        self.build_ui()
 
     # Build the window's UI based on information from the model
-    def build_ui(self, result):
+    def build_ui(self):
         with self._window.frame:
             with ui.VStack():
                 with ui.HStack(height=0):
                     with ui.VStack():
                         ui.Label("Username:", style=lab_style)
                         uField = ui.StringField()
-                        uField.model.add_end_edit_fn(lambda m, value=self._model.get_item("user"):
-                                                     self.on_changed(value, m.get_value_as_string()))
+                        uField.model.add_end_edit_fn(lambda m,
+                                                     item=self._model.get_item("user"):
+                                                     self.on_changed(item, m.get_value_as_string()))
 
                     with ui.VStack():
                         ui.Label("Password:", style=lab_style)
                         pField = ui.StringField(password_mode=True)
-                        pField.model.add_end_edit_fn(lambda m, value=self._model.get_item("pass"):
-                                                     self.on_changed(value, m.get_value_as_string()))
+                        pField.model.add_end_edit_fn(lambda m,
+                                                     item=self._model.get_item("pass"):
+                                                     self.on_changed(item, m.get_value_as_string()))
 
                 result = self._model.get_value(self._model.get_item("result"))
                 if result:
@@ -100,7 +102,7 @@ class Connector(omni.ext.IExt):
         print("[lm.db.connector] MyExtension startup")
         self._window = ui.Window("Database Info", width=500, height=300)
 
-        self.build_ui(self._model.get_item("result"))
+        self.build_ui()
 
     def on_shutdown(self):
         print("[lm.db.connector] MyExtension shutdown")
