@@ -4,6 +4,9 @@ from omni.ui import scene as sc
 from pxr import Tf, Usd, UsdGeom, UsdShade
 import omni.usd
 
+# The distance to raise above the top of the object's bounding box
+TOP_OFFSET = 5
+
 
 class DBModel(sc.AbstractManipulatorModel):
 
@@ -58,23 +61,38 @@ class DBModel(sc.AbstractManipulatorModel):
         pass
 
     # Accessor methods
-    def get_user(self):
-        return self._user
-
-    def get_pass(self):
-        return self._pass
-
-    def get_result(self):
-        return self._result
+    def get_item(self, id):
+        if id == "position":
+            return self.position
+        if id == "user":
+            return self._user
+        if id == "pass":
+            return self._pass
+        if id == "result":
+            return self._result
 
     def get_value(self, item):
+        if item == self.position:
+            return self._get_position()
+
         if item == self._user:
-            return self._user.value
-        if item == self._pass:
-            return self._pass.value
-        if item == self._result:
-            return self._result.value
+            item.value
         return False
+
+    def _get_position(self):
+        stage = self._get_context().get_stage()
+        if not stage or not self._current_path:
+            return [0, 0, 0]
+
+        prim = stage.GetPrimAtPath(self._current_path)
+        box_cache = UsdGeom.BBoxCache(Usd.TimeCode.Default(), includedPurposes=[UsdGeom.Tokens.default_])
+        bound = box_cache.ComputeWorldBound(prim)
+        range = bound.ComputeAlignedBox()
+        bboxMin = range.GetMin()
+        bboxMax = range.GetMax()
+
+        position = [(bboxMin[0] + bboxMax[0]) * 0.5, bboxMax[1] + TOP_OFFSET, (bboxMin[2] + bboxMax[2]) * 0.5]
+        return position
 
     # Updater methods
     def set_value(self, item, changed):

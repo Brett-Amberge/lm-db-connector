@@ -1,6 +1,4 @@
-"""
-    Main extension file for connecting to mysql database
-"""
+""" Main extension file for connecting to mysql database s"""
 
 import omni.ext
 import omni.ui as ui
@@ -55,9 +53,10 @@ class Connector(omni.ext.IExt):
 
     # Populate the UI with any information retrieved from the database
     def on_pressed(self):
-        self._model.set_value(self._model.get_result(), self.connect(self._model.get_value(self._model.get_user()),
-                              self._model.get_value(self._model.get_pass())))
-        self.build_ui(self._model.get_result())
+        self._model.set_value(self._model.get_item("result"),
+                              self.connect(self._model.get_value(self._model.get_item("user")),
+                              self._model.get_value(self._model.get_item("pass"))))
+        self.build_ui(self._model.get_item("result"))
 
     # Build the window's UI based on information from the model
     def build_ui(self, result):
@@ -76,7 +75,7 @@ class Connector(omni.ext.IExt):
                         pField.model.add_end_edit_fn(lambda m, value=self._model.get_pass():
                                                      self.on_changed(value, m.get_value_as_string()))
 
-                result = self._model.get_value(self._model.get_result())
+                result = self._model.get_value(self._model.get_item("result"))
                 if len(result) > 0:
                     with ui.ScrollingFrame(horizontal_scrollbar_policy=ui.ScrollBarPolicy.SCROLLBAR_AS_NEEDED,
                                            vectrical_scrollbar_policy=ui.ScrollBarPolicy.SCROLLBAR_AS_NEEDED):
