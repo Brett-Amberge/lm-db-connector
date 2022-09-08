@@ -27,19 +27,16 @@ class Connector(omni.ext.IExt):
     def __init__(self):
         self._model = DBModel()
         self._window = None
+        self._cnx = None
+        self._connected = False
 
         self._viewport_scene = None
 
     # Attempt to connect to the sql database with user provided username and password
     def connect(self, user, password):
         try:
-            cnx = pymysql.connect(user=user, password=password, host='127.0.0.1', port=3306, database='sakila')
-            with cnx:
-                with cnx.cursor() as cursor:
-                    sql = "SELECT * FROM film"
-                    cursor.execute(sql)
-                    result = cursor.fetchall()
-                    return result
+            self._cnx = pymysql.connect(user=user, password=password, host='127.0.0.1', port=3306, database='sakila')
+            self._connected = True
         except:
             # Alert the user if the connection fails
             carb.log_warn("Failed to connect to database")
@@ -52,33 +49,52 @@ class Connector(omni.ext.IExt):
     # Populate the UI with any information retrieved from the database
     def on_pressed(self):
         self._model.set_value(self._model.get_item("result"),
-                              self.connect(self._model.get_value(self._model.get_item("user")),
-                                           self._model.get_value(self._model.get_item("pass"))))
+                            self.connect(self._model.get_value(self._model.get_item("user")),
+                                        self._model.get_value(self._model.get_item("pass"))))
+        self._model.set_value(self._model.get_item("result"), self.query())
         self.build_ui()
+
+    def query(self, query=False):
+        if self._connected:
+            with self._cnx:
+                with self._cnx.cursor() as cursor:
+                    sql = query if query else "SELECT * FROM film"
+                    cursor.execute(sql)
+                    result = cursor.fetchall()
+                    return result
+        else:
+            carb.log_warn("[lm.db.connector] Connection error")
 
     # Build the window's UI based on information from the model
     def build_ui(self):
         with self._window.frame:
-            with ui.VStack():
-                with ui.HStack(height=0):
-                    with ui.VStack():
-                        ui.Label("Username:", style=lab_style)
-                        uField = ui.StringField()
-                        uField.model.add_end_edit_fn(lambda m,
-                                                     item=self._model.get_item("user"):
-                                                     self.on_changed(item, m.get_value_as_string()))
+            if not self._connected:
+                with ui.VStack():
+                    with ui.HStack(height=0):
+                        with ui.VStack():
+                            ui.Label("Username:", style=lab_style)
+                            uField = ui.StringField()
+                            uField.model.add_end_edit_fn(lambda m,
+                                                        item=self._model.get_item("user"):
+                                                        self.on_changed(item, m.get_value_as_string()))
 
-                    with ui.VStack():
-                        ui.Label("Password:", style=lab_style)
-                        pField = ui.StringField(password_mode=True)
-                        pField.model.add_end_edit_fn(lambda m,
-                                                     item=self._model.get_item("pass"):
-                                                     self.on_changed(item, m.get_value_as_string()))
+                        with ui.VStack():
+                            ui.Label("Password:", style=lab_style)
+                            pField = ui.StringField(password_mode=True)
+                            pField.model.add_end_edit_fn(lambda m,
+                                                        item=self._model.get_item("pass"):
+                                                        self.on_changed(item, m.get_value_as_string()))
 
-                result = self._model.get_value(self._model.get_item("result"))
-                if result:
+                    ui.Button(text="Connect to a database", clicked_fn=lambda: self.on_pressed(),
+                              style=btn_style)
+
+            else:
+                with ui.VStack():
+                    ui.Label("Query Result:", style=lab_style, height=0)
+
+                    result = self._model.get_value(self._model.get_item("result"))
                     with ui.ScrollingFrame(horizontal_scrollbar_policy=ui.ScrollBarPolicy.SCROLLBAR_AS_NEEDED,
-                                           vectrical_scrollbar_policy=ui.ScrollBarPolicy.SCROLLBAR_AS_NEEDED):
+                                        vectrical_scrollbar_policy=ui.ScrollBarPolicy.SCROLLBAR_AS_NEEDED):
                         with ui.VGrid():
                             for entry in result:
                                 with ui.HStack():
@@ -86,9 +102,6 @@ class Connector(omni.ext.IExt):
                                         with ui.ZStack():
                                             ui.Rectangle(style=rect_style)
                                             ui.Label(str(entry[i]), style=db_style)
-                else:
-                    ui.Button(text="Connect to a database", clicked_fn=lambda: self.on_pressed(),
-                              style=btn_style)
 
     # ext_id is current extension id. It can be used with extension manager to query additional information, like where
     # this extension is located on filesystem.
