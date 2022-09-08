@@ -3,8 +3,10 @@
 import omni.ext
 import omni.ui as ui
 import carb
+from omni.kit.viewport.utility import get_active_viewport_window
 
 from .db_model import DBModel
+from .viewport_scene import ViewportScene
 from .styles import lab_style, rect_style, btn_style, db_style
 
 # Try to import the mysql library
@@ -26,6 +28,8 @@ class Connector(omni.ext.IExt):
         self._model = DBModel()
         self._window = None
         self._headers = None
+
+        self._viewport_scene = None
 
     # Attempt to connect to the sql database with user provided username and password
     def connect(self, user, password):
@@ -102,6 +106,17 @@ class Connector(omni.ext.IExt):
         print("[lm.db.connector] MyExtension startup")
         self._window = ui.Window("Database Info", width=500, height=300)
 
+        # Get the active Viewport
+        viewport_window = get_active_viewport_window()
+
+        if not viewport_window:
+            carb.log_error(f"No Viewport Window to add {ext_id} scene to")
+            return
+
+        # Build out the scene
+        self._viewport_scene = ViewportScene(viewport_window, ext_id)
+
+        # Build out the UI
         self.build_ui()
 
     def on_shutdown(self):
