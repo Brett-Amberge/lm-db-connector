@@ -20,8 +20,9 @@ class DBModel(sc.AbstractManipulatorModel):
             self.value = value
 
     class PositionItem(sc.AbstractManipulatorItem):
-        def __init__(self, value=[0, 0, 0]):
-            self.value = value
+        def __init__(self):
+            super().__init__()
+            self.value = [0, 0, 0]
 
     def __init__(self):
         super().__init__()
@@ -39,7 +40,7 @@ class DBModel(sc.AbstractManipulatorModel):
         # Track Selection changes
         self._events = usd_context.get_stage_event_stream()
         self._stage_event_sub = self._events.create_subscription_to_pop(
-            self._on_stage_event, name="Scene Selector Selection Update"
+            self._on_stage_event, name="Scene Selection Update"
         )
 
         # Database information
