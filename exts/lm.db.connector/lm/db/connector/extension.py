@@ -26,7 +26,6 @@ class Connector(omni.ext.IExt):
         self._model = DBModel()
         self._window = None
         self._headers = None
-        self.label_style = lab_style
 
     # Attempt to connect to the sql database with user provided username and password
     def connect(self, user, password):
@@ -66,17 +65,17 @@ class Connector(omni.ext.IExt):
                     with ui.VStack():
                         ui.Label("Username:", style=lab_style)
                         uField = ui.StringField()
-                        uField.model.add_end_edit_fn(lambda m, value=self._model.get_user():
+                        uField.model.add_end_edit_fn(lambda m, value=self._model.get_item("user"):
                                                      self.on_changed(value, m.get_value_as_string()))
 
                     with ui.VStack():
                         ui.Label("Password:", style=lab_style)
                         pField = ui.StringField(password_mode=True)
-                        pField.model.add_end_edit_fn(lambda m, value=self._model.get_pass():
+                        pField.model.add_end_edit_fn(lambda m, value=self._model.get_item("pass"):
                                                      self.on_changed(value, m.get_value_as_string()))
 
                 result = self._model.get_value(self._model.get_item("result"))
-                if len(result) > 0:
+                if result:
                     with ui.ScrollingFrame(horizontal_scrollbar_policy=ui.ScrollBarPolicy.SCROLLBAR_AS_NEEDED,
                                            vectrical_scrollbar_policy=ui.ScrollBarPolicy.SCROLLBAR_AS_NEEDED):
                         with ui.VGrid():
@@ -101,7 +100,7 @@ class Connector(omni.ext.IExt):
         print("[lm.db.connector] MyExtension startup")
         self._window = ui.Window("Database Info", width=500, height=300)
 
-        self.build_ui(self._model.get_result())
+        self.build_ui(self._model.get_item("result"))
 
     def on_shutdown(self):
         print("[lm.db.connector] MyExtension shutdown")
