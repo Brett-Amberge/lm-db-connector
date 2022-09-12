@@ -45,14 +45,6 @@ class SceneSelector(sc.Manipulator):
         carb.log_warn(res[0])
         self.model.set_value(self.model.get_item("result"), res)
 
-        position = self.model.get_value(self.model.get_item("position"))
-
-        # Move everything to where the selected object is
-        with sc.Transform(transform=sc.Matrix44.get_translation_matrix(*position)):
-            # Rotate everything to look at the camera
-            with sc.Transform(look_at=sc.Transform.LookAt.CAMERA):
-                sc.Label(f"Prim: {self.model.get_item('name')}", alignment=ui.Alignment.LEFT_BOTTOM)
-
         self.build_ui()
 
     # Regenerates the manipulator
@@ -107,4 +99,8 @@ class SceneSelector(sc.Manipulator):
                                                     self.on_changed(item, m.get_value_as_string()))
                     ui.Button("Connect", style=btn_style, clicked_fn=lambda: self.on_pressed())
             else:
-                ui.Label("Connection successful")
+                result = self.model.get_value(self.model.get_item("result"))
+                if result:
+                    ui.Label(f"Result: {result[0]}", style=lab_style)
+                else:
+                    ui.Label("Select an object to see database information", style=lab_style)
