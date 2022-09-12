@@ -8,6 +8,8 @@ import omni.ui as ui
 import omni.kit
 import carb
 
+from .styles import *
+
 # Attempt to import the mysql package
 try:
     import pymysql
@@ -24,7 +26,9 @@ class SceneSelector(sc.Manipulator):
 
         self._cnx = None
         self._connected = False
-        self._window = ui.Window("Database UI", width=200, height=200)
+        self._user = ""
+        self._password = ""
+        self._window = ui.Window("Database UI", width=300, height=200)
 
         self.build_ui()
 
@@ -35,8 +39,6 @@ class SceneSelector(sc.Manipulator):
 
         if self.model.get_item("name") == "":
             return
-
-        self.connect()
 
         query = "SELECT meta FROM omnitest WHERE pth=" + "\"" + self.model.get_item('name') + "\""
         res = self.query(query)
@@ -58,10 +60,9 @@ class SceneSelector(sc.Manipulator):
         self.invalidate()
 
     # Attempt to connect to the sql database with user provided username and password
-    def connect(self):
+    def connect(self, user, password):
         try:
-            self._cnx = pymysql.connect(user='root', password='', host='127.0.0.1', port=3306,
-                                        database='sakila')
+            self._cnx = pymysql.connect(user=user, password=password, host='127.0.0.1', port=3306, database='sakila')
             self._connected = True
         except:
             # Alert the user if the connection fails
@@ -78,7 +79,32 @@ class SceneSelector(sc.Manipulator):
         else:
             carb.log_warn("[lm.db.connector] Connection error")
 
+    # UI element functions
+    def on_changed(self, item, value):
+        if item == 'user':
+            self._user = value
+        if item == 'pass':
+            self._password = value
+
+    def on_pressed(self):
+        self.connect(self._user, self._password)
+        self.build_ui()
+
     # Build UI elements based on data stored in model
     def build_ui(self):
         with self._window.frame:
-            ui.Label(f"Query result: {self.model.get_value(self.model.get_item('result'))}")
+            if not self._connected:
+                with ui.VStack(height=0):
+                    with ui.HStack():
+                        ui.Label("User:", style=lab_style)
+                        uField = ui.StringField()
+                        uField.model.add_end_edit_fn(lambda m, item='user':
+                                                    self.on_changed(item, m.get_value_as_string()))
+                    with ui.HStack():
+                        ui.Label("Password:", style=lab_style)
+                        pField = ui.StringField(password_mode=True)
+                        pField.model.add_end_edit_fn(lambda m, item='pass':
+                                                    self.on_changed(item, m.get_value_as_string()))
+                    ui.Button("Connect", style=btn_style, clicked_fn=lambda: self.on_pressed())
+            else:
+                ui.Label("Connection successful")
