@@ -53,7 +53,7 @@ class DBModel(sc.AbstractManipulatorModel):
     def _notice_changed(self, notice: Usd.Notice, stage: Usd.Stage) -> None:
         for p in notice.GetChangedInfoOnlyPaths():
             if self._current_path in str(p.GetPrimPath()):
-                self._item_changed(self.position)
+                self._item_changed(self._current_path)
 
     # Update the model when a selection has changed
     def _on_kit_selection_changed(self):
@@ -67,7 +67,7 @@ class DBModel(sc.AbstractManipulatorModel):
         prim_paths = usd_context.get_selection().get_selected_prim_paths()
         if not prim_paths:
             # Turn the manipulator off if nothing is selected
-            self._item_changed(self.position)
+            self._item_changed(self._current_path)
             self.set_value(self._result, [])
             return
 
@@ -92,8 +92,6 @@ class DBModel(sc.AbstractManipulatorModel):
 
     # Accessor methods
     def get_item(self, id):
-        if id == "position":
-            return self.position
         if id == "result":
             return self._result
         if id == "name":
