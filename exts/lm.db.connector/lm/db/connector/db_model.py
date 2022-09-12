@@ -19,11 +19,6 @@ class DBModel(sc.AbstractManipulatorModel):
         def __init__(self, value=[]):
             self.value = value
 
-    class PositionItem(sc.AbstractManipulatorItem):
-        def __init__(self):
-            super().__init__()
-            self.value = [0, 0, 0]
-
     def __init__(self):
         super().__init__()
 
@@ -32,7 +27,6 @@ class DBModel(sc.AbstractManipulatorModel):
         self._current_path = ""
 
         self._stage_listener = None
-        self.position = DBModel.PositionItem()
 
         # Save the UsdContext
         usd_context = self._get_context()
@@ -74,6 +68,7 @@ class DBModel(sc.AbstractManipulatorModel):
         if not prim_paths:
             # Turn the manipulator off if nothing is selected
             self._item_changed(self.position)
+            self.set_value(self._result, [])
             return
 
         prim = stage.GetPrimAtPath(prim_paths[0])
@@ -93,7 +88,7 @@ class DBModel(sc.AbstractManipulatorModel):
         self._current_path = prim_paths[0]
 
         # Position is changed, tell the manipulator to update
-        self._item_changed(self.position)
+        self._item_changed(self._current_path)
 
     # Accessor methods
     def get_item(self, id):
@@ -105,27 +100,9 @@ class DBModel(sc.AbstractManipulatorModel):
             return self._current_path
 
     def get_value(self, item):
-        if item == self.position:
-            return self._get_position()
-
         if item:
             return item.value
         return False
-
-    def _get_position(self):
-        stage = self._get_context().get_stage()
-        if not stage or not self._current_path:
-            return [0, 0, 0]
-
-        prim = stage.GetPrimAtPath(self._current_path)
-        box_cache = UsdGeom.BBoxCache(Usd.TimeCode.Default(), includedPurposes=[UsdGeom.Tokens.default_])
-        bound = box_cache.ComputeWorldBound(prim)
-        range = bound.ComputeAlignedBox()
-        bboxMin = range.GetMin()
-        bboxMax = range.GetMax()
-
-        position = [(bboxMin[0] + bboxMax[0]) * 0.5, bboxMax[1] + TOP_OFFSET, (bboxMin[2] + bboxMax[2]) * 0.5]
-        return position
 
     # Updater methods
     def set_value(self, item, changed):
