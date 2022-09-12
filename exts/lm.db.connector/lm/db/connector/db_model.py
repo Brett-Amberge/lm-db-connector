@@ -44,8 +44,6 @@ class DBModel(sc.AbstractManipulatorModel):
         )
 
         # Database information
-        self._user = DBModel.StringItem()
-        self._pass = DBModel.StringItem()
         self._result = DBModel.ListItem()
 
     # Get the current UsdContext we are attached to
@@ -101,10 +99,6 @@ class DBModel(sc.AbstractManipulatorModel):
     def get_item(self, id):
         if id == "position":
             return self.position
-        if id == "user":
-            return self._user
-        if id == "pass":
-            return self._pass
         if id == "result":
             return self._result
         if id == "name":
@@ -135,10 +129,6 @@ class DBModel(sc.AbstractManipulatorModel):
 
     # Updater methods
     def set_value(self, item, changed):
-        if item == self._user:
-            self._user.value = changed
-        if item == self._pass:
-            self._pass.value = changed
         if item == self._result:
             self._result.value = changed
         return self.get_value(item)
