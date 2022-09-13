@@ -38,9 +38,10 @@ class SceneSelector(sc.Manipulator):
         if self.model.get_item("name") == "":
             return
 
-        query = "SELECT meta FROM omnitest WHERE pth=" + "\"" + self.model.get_item('name') + "\""
-        res = self.query(query)
-        self.model.set_value(self.model.get_item("result"), res)
+        if self.model.get_value(self.model.get_item("connected")):
+            query = "SELECT meta FROM omnitest WHERE pth=" + "\"" + self.model.get_item('name') + "\""
+            res = self.query(query)
+            self.model.set_value(self.model.get_item("result"), res)
 
         self.build_ui()
 
@@ -60,15 +61,15 @@ class SceneSelector(sc.Manipulator):
             return False
 
     def query(self, query=False):
-        if self.model.get_value(self.model.get_item("connected")):
+        try:
             cnx = self.model.get_value(self.model.get_item("cnx"))
             with cnx:
                 with cnx.cursor() as cursor:
                     cursor.execute(query)
                     result = cursor.fetchone()
                     return result
-        else:
-            carb.log_warn("[lm.db.connector] Connection error")
+        except:
+            carb.log_warn("Connection error")
 
     # UI element functions
     def on_changed(self, item, value):
