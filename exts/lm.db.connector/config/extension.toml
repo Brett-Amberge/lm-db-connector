@@ -3,8 +3,8 @@
 version = "1.0.0"
 
 # The title and description fields are primarily for displaying extension info in UI
-title = "Simple UI Extension Template"
-description="The simplest python extension example. Use it as a starting point for your extensions."
+title = "SQL Database Connection Tool"
+description="A tool for connecting to a SQL database that stores information about library parts stored as USDs."
 
 # Path (relative to the root) or content of readme markdown file for UI.
 readme  = "docs/README.md"
@@ -13,10 +13,10 @@ readme  = "docs/README.md"
 repository = ""
 
 # One of categories for UI.
-category = "Example"
+category = "Database"
 
 # Keywords for the extension
-keywords = ["kit", "example"]
+keywords = ["kit", "database", "sql", "usd"]
 
 
 # Use omni.ui to build simple UI
