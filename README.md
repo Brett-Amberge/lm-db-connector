@@ -13,7 +13,7 @@ This application works in any Omniverse Kit application the has an active Viewpo
 - Click the green + icon to add an additional path
 - Copy the path to the `exts` file in the location that you cloned the repository
 
-![The Omniverse Kit extension manager](./assests/ext_window.png)
+![The Omniverse Kit extension manager](./assets/ext_window.png)
 
 The extension will now appear in the search pane on the right. Simply toggle it on to enable it.
 
