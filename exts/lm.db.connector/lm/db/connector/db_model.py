@@ -3,9 +3,7 @@
 from omni.ui import scene as sc
 from pxr import Tf, Usd, UsdGeom
 import omni.usd
-
-# The distance to raise above the top of the object's bounding box
-TOP_OFFSET = 5
+import carb
 
 
 class DBModel(sc.AbstractManipulatorModel):
@@ -17,6 +15,14 @@ class DBModel(sc.AbstractManipulatorModel):
 
     class ListItem(sc.AbstractManipulatorItem):
         def __init__(self, value=[]):
+            self.value = value
+
+    class BoolItem(sc.AbstractManipulatorItem):
+        def __init__(self, value=False):
+            self.value = value
+
+    class ConnectionItem(sc.AbstractManipulatorItem):
+        def __init__(self, value=None):
             self.value = value
 
     def __init__(self):
@@ -39,6 +45,8 @@ class DBModel(sc.AbstractManipulatorModel):
 
         # Database information
         self._result = DBModel.ListItem()
+        self._connected = DBModel.BoolItem()
+        self._cnx = DBModel.ConnectionItem()
 
     # Get the current UsdContext we are attached to
     def _get_context(self) -> Usd.Stage:
@@ -67,8 +75,8 @@ class DBModel(sc.AbstractManipulatorModel):
         prim_paths = usd_context.get_selection().get_selected_prim_paths()
         if not prim_paths:
             # Turn the manipulator off if nothing is selected
-            self._item_changed(self._current_path)
             self.set_value(self._result, [])
+            self._item_changed(self._current_path)
             return
 
         prim = stage.GetPrimAtPath(prim_paths[0])
@@ -96,6 +104,10 @@ class DBModel(sc.AbstractManipulatorModel):
             return self._result
         if id == "name":
             return self._current_path
+        if id == "connected":
+            return self._connected
+        if id == "cnx":
+            return self._cnx
 
     def get_value(self, item):
         if item:
@@ -106,4 +118,8 @@ class DBModel(sc.AbstractManipulatorModel):
     def set_value(self, item, changed):
         if item == self._result:
             self._result.value = changed
+        if item == self._connected:
+            self._connected.value = changed
+        if item == self._cnx:
+            self._cnx.value = changed
         return self.get_value(item)

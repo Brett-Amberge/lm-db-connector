@@ -24,8 +24,6 @@ class SceneSelector(sc.Manipulator):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self._cnx = None
-        self._connected = False
         self._user = ""
         self._password = ""
         self._window = ui.Window("Database UI", width=300, height=200)
@@ -42,7 +40,6 @@ class SceneSelector(sc.Manipulator):
 
         query = "SELECT meta FROM omnitest WHERE pth=" + "\"" + self.model.get_item('name') + "\""
         res = self.query(query)
-        carb.log_warn(res[0])
         self.model.set_value(self.model.get_item("result"), res)
 
         self.build_ui()
@@ -54,17 +51,19 @@ class SceneSelector(sc.Manipulator):
     # Attempt to connect to the sql database with user provided username and password
     def connect(self, user, password):
         try:
-            self._cnx = pymysql.connect(user=user, password=password, host='127.0.0.1', port=3306, database='sakila')
-            self._connected = True
+            cnx = pymysql.connect(user=user, password=password, host='127.0.0.1', port=3306, database='sakila')
+            self.model.set_value(self.model.get_item("cnx"), cnx)
+            self.model.set_value(self.model.get_item("connected"), True)
         except:
             # Alert the user if the connection fails
             carb.log_warn("Failed to connect to database")
             return False
 
     def query(self, query=False):
-        if self._connected:
-            with self._cnx:
-                with self._cnx.cursor() as cursor:
+        if self.model.get_value(self.model.get_item("connected")):
+            cnx = self.model.get_value(self.model.get_item("cnx"))
+            with cnx:
+                with cnx.cursor() as cursor:
                     cursor.execute(query)
                     result = cursor.fetchone()
                     return result
@@ -85,7 +84,7 @@ class SceneSelector(sc.Manipulator):
     # Build UI elements based on data stored in model
     def build_ui(self):
         with self._window.frame:
-            if not self._connected:
+            if not self.model.get_value(self.model.get_item("connected")):
                 with ui.VStack(height=0):
                     with ui.HStack():
                         ui.Label("User:", style=lab_style)
@@ -100,7 +99,7 @@ class SceneSelector(sc.Manipulator):
                     ui.Button("Connect", style=btn_style, clicked_fn=lambda: self.on_pressed())
             else:
                 result = self.model.get_value(self.model.get_item("result"))
-                if result:
+                if len(result) > 0:
                     ui.Label(f"Result: {result[0]}", style=lab_style)
                 else:
                     ui.Label("Select an object to see database information", style=lab_style)
