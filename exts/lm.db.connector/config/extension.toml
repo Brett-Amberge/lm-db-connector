@@ -6,11 +6,11 @@ version = "1.0.0"
 title = "SQL Database Connection Tool"
 description="A tool for connecting to a SQL database that stores information about library parts stored as USDs."
 
-# Path (relative to the root) or content of readme markdown file for UI.
+# Path to the readme markdown file for.
 readme  = "../../README.md"
 
 # URL of the extension source repository.
-repository = ""
+repository = "https://github.com/Brett-Amberge/lm-db-connector"
 
 # One of categories for UI.
 category = "Database"
