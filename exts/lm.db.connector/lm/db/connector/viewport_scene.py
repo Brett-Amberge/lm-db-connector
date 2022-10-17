@@ -1,4 +1,6 @@
-""" Adds the manipulator and model to the viewport scene
+"""
+Class for setting up the viewport scene when the app is start.
+Retrieves the current viewport window and scene, then applys a fresh manipulator object to it.
 """
 
 from omni.ui import scene as sc
@@ -19,13 +21,16 @@ class ViewportScene():
         with self._viewport_window.get_frame(ext_id):
 
             self._scene_view = sc.SceneView()
+
             # Add the manipulator into the scene
             with self._scene_view.scene:
+                # Create a new model instance and point the manipulator's model value to it
                 SceneSelector(model=DBModel())
 
             # Register the SceneView with the Viewport to get projection and view updates
             self._viewport_window.viewport_api.add_scene_view(self._scene_view)
 
+    # Clean up when the app is closed
     def __del__(self):
         self.destroy()
 

@@ -1,4 +1,7 @@
-""" Main extension file for connecting to mysql database s"""
+"""
+Main extension file for connecting to mysql database.
+This is the file that Omniverse searchs for when launching the extension.
+"""
 
 import omni.ext
 import omni.ui as ui
@@ -30,7 +33,7 @@ class Connector(omni.ext.IExt):
             carb.log_error(f"No Viewport Window to add {ext_id} scene to")
             return
 
-        # Build out the scene
+        # Build out the scene, passing the active viewport window to the scene object
         self._viewport_scene = ViewportScene(viewport_window, ext_id)
 
     def on_shutdown(self):
