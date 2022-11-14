@@ -29,15 +29,6 @@ keywords = ["kit", "database", "sql", "usd"]
 [[python.module]]
 name = "lm.db.connector"
 
-# List of additional directories with pip archives to be passed into pip using ``--find-links`` arg
-# Relative paths are relative to the extension root
-[python.pipapi]
-archiveDirs = ["omnienv/Lib/site-packages/pip"]
-
-# Commands to be passed to pip install before extension gets enabled
-requirements = [
-    "pydobc",
-]
-
-# Determines if pip will use online index if packages cannot be found locally
-use_online_index = false
+[[python.module]]
+name = "pyodbc"
+path = "../deps"

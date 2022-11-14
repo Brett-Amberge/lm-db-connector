@@ -11,13 +11,13 @@ import carb
 
 from .styles import *
 
-# Attempt to import the mysql package
+
 try:
-    import pymysql
+    import pyodbc
 except ImportError:
-    carb.log_warn("pymysql not found, attempting to install")
-    omni.kit.pipapi.install("pymysql")
-    import pymysql
+    carb.log_warn("pyodbc not found, attempting to install")
+    omni.kit.pipapi.install("pyodbc")
+    import pyodbc
 
 
 class SceneSelector(sc.Manipulator):
